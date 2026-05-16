@@ -344,9 +344,8 @@ function toggleConsent(){
   }
 }
 
-// Fonction de soumission robuste interceptée
 function handleFormSubmit(event) {
-  event.preventDefault(); // Stoppe le rechargement par défaut
+  event.preventDefault(); 
   
   var p = document.getElementById('prenom').value.trim();
   var n = document.getElementById('nom').value.trim();
@@ -354,14 +353,9 @@ function handleFormSubmit(event) {
   
   if(!p || !n || !ph){ alert('Veuillez remplir tous les champs.'); return false; }
   if(!consentGiven){ alert('Veuillez accepter les conditions de transmission de vos données.'); return false; }
-  
-  if(typeof fbq !== 'undefined'){
-    fbq('track', 'Lead', {content_name: 'Solaire Helvetipro'});
-  }
 
   var form = document.getElementById('solarForm');
 
-  // Injecte dynamiquement les choix d'étapes récoltés précédemment
   for (var key in data) {
     if (data.hasOwnProperty(key)) {
       var hiddenInput = document.createElement('input');
@@ -375,18 +369,15 @@ function handleFormSubmit(event) {
   var formData = new FormData(form);
   var thankYouUrl = window.location.origin + '/merci.html?phone=' + encodeURIComponent(ph) + '&name=' + encodeURIComponent(p + ' ' + n);
   
-  // Envoi asynchrone sécurisé vers Formspree
   fetch('https://formspree.io/f/mlgzwvzn', {
     method: 'POST',
     body: formData,
     headers: { 'Accept': 'application/json' }
   })
   .then(function(response) {
-    // Redirection immédiate dès la réponse reçue
     window.location.href = thankYouUrl;
   })
   .catch(function(error) {
-    // Redirection de secours si un bloqueur empêche la réponse de passer
     window.location.href = thankYouUrl;
   });
 
