@@ -7,7 +7,6 @@
 <meta name="description" content="Estimation gratuite panneaux solaires Suisse romande. Subventions cantonales jusqu'à 45%. Maisons et locaux commerciaux.">
 <meta name="facebook-domain-verification" content="hp34n6y8mk0ymweagsx7dj81ojcjli" />
 
-<!-- Meta Pixel via Stape CAPIG — Server-side tracking -->
 <script>
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '27412048241733681');
@@ -351,10 +350,12 @@ function submit(){
   if(!consentGiven){alert('Veuillez accepter les conditions de transmission de vos données.');return;}
   data.prenom=p; data.nom=n; data.phone=ph;
 
+  // Fire pixel Lead
   if(typeof fbq!=='undefined'){
-    fbq('track','Lead',{content_name:'Solaire Suisse Romande'});
+    fbq('track','Lead',{content_name:'Solaire Helvetipro'});
   }
 
+  // Envoyer à StaticForms
   fetch('https://api.staticforms.dev/submit',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -366,10 +367,11 @@ function submit(){
       message:'Propriétaire: '+(data.proprio||'N/A')+'\nType de bien: '+(data.type||'N/A')+'\nTiming: '+(data.timing||'N/A')+'\nTéléphone: '+ph,
       replyTo:'hypnogva@gmail.com'
     })
-  }).catch(function(){});
+  }).catch(function(e){console.log('StaticForms error:',e);});
 
+  // Redirection vers merci.html — URL complète
   setTimeout(function(){
-    window.location.href='https://www.helvetiproenergie.ch/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
+    window.location.href='https://helvetiproenergie.ch/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
   }, 800);
 }
 </script>
