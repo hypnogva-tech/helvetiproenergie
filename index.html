@@ -136,7 +136,7 @@ footer{padding:24px;border-top:1px solid rgba(0,0,0,0.08);text-align:center;font
 </div>
 
 <div class="form-section" id="form">
-  <div class="card">
+  <form class="card" action="https://formspree.io/f/mlgzwvzn" method="POST" id="solarForm">
     <div class="card-title">Votre estimation gratuite</div>
     <div class="card-sub">2 min · Sans engagement · Réponse sous 24h · Installateur certifié</div>
     <div class="prog" id="prog">
@@ -161,7 +161,7 @@ footer{padding:24px;border-top:1px solid rgba(0,0,0,0.08);text-align:center;font
         <div class="opt" onclick="pick(this,2,'type','commercial')"><div class="opt-icon">🏭</div>Local commercial / industriel</div>
         <div class="opt" onclick="pick(this,2,'type','appart')"><div class="opt-icon">🏢</div>Appartement / PPE</div>
       </div>
-      <button class="btn-back" onclick="goTo(1)">← Retour</button>
+      <button type="button" class="btn-back" onclick="goTo(1)">← Retour</button>
     </div>
 
     <div class="step" id="s3">
@@ -171,25 +171,27 @@ footer{padding:24px;border-top:1px solid rgba(0,0,0,0.08);text-align:center;font
         <div class="opt" onclick="pick(this,3,'timing','6m')"><div class="opt-icon">📅</div>Dans les 6 mois</div>
         <div class="opt" onclick="pick(this,3,'timing','info')"><div class="opt-icon">🔍</div>Je me renseigne encore</div>
       </div>
-      <button class="btn-back" onclick="goTo(2)">← Retour</button>
+      <button type="button" class="btn-back" onclick="goTo(2)">← Retour</button>
     </div>
 
     <div class="step" id="s4">
       <div class="step-q">Recevez votre estimation personnalisée :</div>
-      <div class="field"><label>Votre prénom</label><input type="text" id="prenom" placeholder="Jean-Pierre" autocomplete="given-name"></div>
-      <div class="field"><label>Votre nom</label><input type="text" id="nom" placeholder="Dupont" autocomplete="family-name"></div>
-      <div class="field"><label>Votre téléphone</label><input type="tel" id="phone" placeholder="+41 79 123 45 67" autocomplete="tel"></div>
+      <div class="field"><label>Votre prénom</label><input type="text" id="prenom" name="prenom" placeholder="Jean-Pierre" autocomplete="given-name"></div>
+      <div class="field"><label>Votre nom</label><input type="text" id="nom" name="nom" placeholder="Dupont" autocomplete="family-name"></div>
+      <div class="field"><label>Votre téléphone</label><input type="tel" id="phone" name="phone" placeholder="+41 79 123 45 67" autocomplete="tel"></div>
+      
       <div id="consentBox" onclick="toggleConsent()" style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;padding:12px;background:#F8F5F0;border-radius:10px;border:2px solid rgba(0,0,0,0.08);cursor:pointer;transition:border-color .2s">
         <div id="consentCheck" style="width:20px;height:20px;flex-shrink:0;border-radius:5px;border:2px solid #C8922A;background:#fff;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:background .2s">
           <span id="consentTick" style="display:none;color:#fff;font-size:13px;font-weight:700">✓</span>
         </div>
         <p style="font-size:.75rem;color:rgba(26,18,8,.6);line-height:1.5;margin:0">J'accepte que mes données personnelles (prénom, nom, téléphone) soient transmises à des installateurs certifiés partenaires en Suisse romande à des fins d'estimation solaire. Conformément à la <strong>nLPD suisse</strong>, vous pouvez retirer votre consentement à tout moment à contact@fluxclients.ch.</p>
       </div>
-      <button class="btn" onclick="submit()">Recevoir mon estimation gratuite →</button>
+      
+      <button type="button" class="btn" onclick="submit()">Recevoir mon estimation gratuite →</button>
       <p class="privacy">🔒 Transmises à des installateurs certifiés partenaires. Jamais revendues. Conforme nLPD.</p>
-      <button class="btn-back" onclick="goTo(3)">← Retour</button>
+      <button type="button" class="btn-back" onclick="goTo(3)">← Retour</button>
     </div>
-  </div>
+  </form>
 </div>
 
 <div class="divider"></div>
@@ -283,7 +285,7 @@ footer{padding:24px;border-top:1px solid rgba(0,0,0,0.08);text-align:center;font
 </div>
 
 <div class="cta-bottom">
-  <h2>Les budgets 2026<br>se ferment bientôt.</h2>
+  <h2>Les budgets 2026<br>se ferm bientôt.</h2>
   <p>Ne laissez pas vos voisins profiter des subventions à votre place.</p>
   <button class="btn-cta-scroll" onclick="document.getElementById('form').scrollIntoView({behavior:'smooth'})">Obtenir mon estimation gratuite →</button>
 </div>
@@ -342,36 +344,40 @@ function toggleConsent(){
   }
 }
 
+// CHANGEMENT ICI : Nouvelle fonction de soumission ultra-robuste
 function submit(){
   var p=document.getElementById('prenom').value.trim();
   var n=document.getElementById('nom').value.trim();
   var ph=document.getElementById('phone').value.trim();
+  
   if(!p||!n||!ph){alert('Veuillez remplir tous les champs.');return;}
   if(!consentGiven){alert('Veuillez accepter les conditions de transmission de vos données.');return;}
-  data.prenom=p; data.nom=n; data.phone=ph;
-
-  // Fire pixel Lead
+  
+  // Fire pixel Lead immédiatement
   if(typeof fbq!=='undefined'){
     fbq('track','Lead',{content_name:'Solaire Helvetipro'});
   }
 
-  // Envoyer à Formspree
-  fetch('https://formspree.io/f/mlgzwvzn',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify({
-      name:p+' '+n,
-      phone:ph,
-      proprio:data.proprio||'N/A',
-      type:data.type||'N/A',
-      timing:data.timing||'N/A'
-    })
-  }).catch(function(e){console.log('Formspree error:',e);});
+  var form = document.getElementById('solarForm');
 
-  // Redirection vers merci.html
-  setTimeout(function(){
-    window.location.href='/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
-  }, 800);
+  // Génération du lien de redirection dynamique pour Formspree (_next)
+  var nextInput = document.createElement('input');
+  nextInput.type = 'hidden';
+  nextInput.name = '_next';
+  nextInput.value = window.location.origin + '/merci.html?phone=' + encodeURIComponent(ph) + '&name=' + encodeURIComponent(p+' '+n);
+  form.appendChild(nextInput);
+
+  // Injection automatique des choix des étapes précédentes (proprio, type, timing) dans les données du formulaire
+  for (var key in data) {
+    var hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = key;
+    hiddenInput.value = data[key];
+    form.appendChild(hiddenInput);
+  }
+
+  // Soumission native : Le navigateur attend le OK de formspree avant de changer de page.
+  form.submit();
 }
 </script>
 </body>
