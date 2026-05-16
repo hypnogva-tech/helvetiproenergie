@@ -357,6 +357,7 @@ function submit(){
 
   fetch('https://api.staticforms.dev/submit',{
     method:'POST',
+    mode:'no-cors',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       apiKey:'sf_e8da9955b64945025e6aa344',
@@ -369,7 +370,7 @@ function submit(){
   }).catch(function(){});
 
   setTimeout(function(){
-    window.location.href='/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
+    window.location.href='https://www.helvetiproenergie.ch/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
   }, 800);
 }
 </script>
