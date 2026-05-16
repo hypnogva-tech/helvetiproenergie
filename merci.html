@@ -367,11 +367,9 @@ function submit(){
       message:'Propriétaire: '+(data.proprio||'N/A')+'\nType de bien: '+(data.type||'N/A')+'\nTiming: '+(data.timing||'N/A')+'\nTéléphone: '+ph,
       replyTo:'contact@fluxclients.ch'
     })
-  }).catch(function(){});
-
-  setTimeout(function(){
+  }).finally(function(){
     window.location.href='https://www.helvetiproenergie.ch/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
-  }, 800);
+  });
 }
 </script>
 </body>
