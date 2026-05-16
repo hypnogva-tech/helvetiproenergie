@@ -136,7 +136,7 @@ footer{padding:24px;border-top:1px solid rgba(0,0,0,0.08);text-align:center;font
 </div>
 
 <div class="form-section" id="form">
-  <form class="card" id="solarForm">
+  <form class="card" id="solarForm" onsubmit="return handleFormSubmit(event)">
     <div class="card-title">Votre estimation gratuite</div>
     <div class="card-sub">2 min · Sans engagement · Réponse sous 24h · Installateur certifié</div>
     <div class="prog" id="prog">
@@ -187,7 +187,7 @@ footer{padding:24px;border-top:1px solid rgba(0,0,0,0.08);text-align:center;font
         <p style="font-size:.75rem;color:rgba(26,18,8,.6);line-height:1.5;margin:0">J'accepte que mes données personnelles (prénom, nom, téléphone) soient transmises à des installateurs certifiés partenaires en Suisse romande à des fins d'estimation solaire. Conformément à la <strong>nLPD suisse</strong>, vous pouvez retirer votre consentement à tout moment à contact@fluxclients.ch.</p>
       </div>
       
-      <button type="button" class="btn" onclick="submit()">Recevoir mon estimation gratuite →</button>
+      <button type="submit" class="btn">Recevoir mon estimation gratuite →</button>
       <p class="privacy">🔒 Transmises à des installateurs certifiés partenaires. Jamais revendues. Conforme nLPD.</p>
       <button type="button" class="btn-back" onclick="goTo(3)">← Retour</button>
     </div>
@@ -325,7 +325,7 @@ function pick(el,step,key,val){
 }
 
 function notOwner(){
-  document.getElementById('s1').innerHTML='<div style="text-align:center;padding:20px 0"><div style="font-size:2rem;margin-bottom:10px">😊</div><p style="font-weight:600;margin-bottom:8px;color:#1A1208">Dommage !</p><p style="font-size:.82rem;color:rgba(26,18,8,.6);line-height:1.6">Les subventions sont réservées aux propriétaires. Revenez si vous devenez propriétaire !</p></div>';
+  document.getElementById('s1').innerHTML='<div style="text-align:center;padding:20px 0"><div style="font-size:2rem;margin-bottom:10px">😊</div><p style="font-weight:600;margin-bottom:8px;color:#1A1208">Dommage !</p><p style="font-size:.82rem;color:rgba(26,18,8);line-height:1.6">Les subventions sont réservées aux propriétaires. Revenez si vous devenez propriétaire !</p></div>';
 }
 
 function toggleConsent(){
@@ -344,41 +344,53 @@ function toggleConsent(){
   }
 }
 
-function submit(){
-  var p=document.getElementById('prenom').value.trim();
-  var n=document.getElementById('nom').value.trim();
-  var ph=document.getElementById('phone').value.trim();
+// Fonction de soumission robuste interceptée
+function handleFormSubmit(event) {
+  event.preventDefault(); // Stoppe le rechargement par défaut
   
-  if(!p||!n||!ph){alert('Veuillez remplir tous les champs.');return;}
-  if(!consentGiven){alert('Veuillez accepter les conditions de transmission de vos données.');return;}
+  var p = document.getElementById('prenom').value.trim();
+  var n = document.getElementById('nom').value.trim();
+  var ph = document.getElementById('phone').value.trim();
   
-  if(typeof fbq!=='undefined'){
-    fbq('track','Lead',{content_name:'Solaire Helvetipro'});
+  if(!p || !n || !ph){ alert('Veuillez remplir tous les champs.'); return false; }
+  if(!consentGiven){ alert('Veuillez accepter les conditions de transmission de vos données.'); return false; }
+  
+  if(typeof fbq !== 'undefined'){
+    fbq('track', 'Lead', {content_name: 'Solaire Helvetipro'});
   }
 
   var form = document.getElementById('solarForm');
 
+  // Injecte dynamiquement les choix d'étapes récoltés précédemment
   for (var key in data) {
-    var hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.name = key;
-    hiddenInput.value = data[key];
-    form.appendChild(hiddenInput);
+    if (data.hasOwnProperty(key)) {
+      var hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = key;
+      hiddenInput.value = data[key];
+      form.appendChild(hiddenInput);
+    }
   }
 
   var formData = new FormData(form);
+  var thankYouUrl = window.location.origin + '/merci.html?phone=' + encodeURIComponent(ph) + '&name=' + encodeURIComponent(p + ' ' + n);
   
+  // Envoi asynchrone sécurisé vers Formspree
   fetch('https://formspree.io/f/mlgzwvzn', {
     method: 'POST',
     body: formData,
-    headers: {
-        'Accept': 'application/json'
-    }
-  }).then(function(response) {
-    window.location.href = window.location.origin + '/merci.html?phone=' + encodeURIComponent(ph) + '&name=' + encodeURIComponent(p+' '+n);
-  }).catch(function(error) {
-    window.location.href = window.location.origin + '/merci.html?phone=' + encodeURIComponent(ph) + '&name=' + encodeURIComponent(p+' '+n);
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(function(response) {
+    // Redirection immédiate dès la réponse reçue
+    window.location.href = thankYouUrl;
+  })
+  .catch(function(error) {
+    // Redirection de secours si un bloqueur empêche la réponse de passer
+    window.location.href = thankYouUrl;
   });
+
+  return false;
 }
 </script>
 </body>
