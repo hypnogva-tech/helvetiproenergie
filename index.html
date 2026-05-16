@@ -7,7 +7,6 @@
 <meta name="description" content="Estimation gratuite panneaux solaires Suisse romande. Subventions cantonales jusqu'à 45%. Maisons et locaux commerciaux.">
 <meta name="facebook-domain-verification" content="hp34n6y8mk0ymweagsx7dj81ojcjli" />
 
-<!-- Meta Pixel via Stape CAPIG — Server-side tracking -->
 <script>
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '27412048241733681');
@@ -108,7 +107,7 @@ footer{padding:24px;border-top:1px solid rgba(0,0,0,0.08);text-align:center;font
 <body>
 
 <nav>
-  <div class="logo">Romandie<span>Énergies</span></div>
+  <div class="logo">Helvetipro<span>Energie</span></div>
   <div class="nav-right">
     <div class="nav-trust">🔒 nLPD Suisse</div>
     <a class="nav-cta" href="#form">Estimation gratuite</a>
@@ -290,7 +289,7 @@ footer{padding:24px;border-top:1px solid rgba(0,0,0,0.08);text-align:center;font
 </div>
 
 <footer>
-  Romandie Énergies · Suisse romande<br>
+  Helvetipro Energie · Suisse romande<br>
   Vos données sont transmises à des installateurs certifiés partenaires. Jamais revendues. Conforme nLPD.
 </footer>
 
@@ -351,26 +350,25 @@ function submit(){
   if(!consentGiven){alert('Veuillez accepter les conditions de transmission de vos données.');return;}
   data.prenom=p; data.nom=n; data.phone=ph;
 
-  // 1. Fire pixel Lead sur cette page
+  // Fire pixel Lead
   if(typeof fbq!=='undefined'){
-    fbq('track','Lead',{content_name:'Solaire Suisse Romande'});
+    fbq('track','Lead',{content_name:'Solaire Helvetipro'});
   }
 
-  // 2. Envoyer à StaticForms
-  fetch('https://api.staticforms.dev/submit',{
+  // Envoyer à Formspree
+  fetch('https://formspree.io/f/mlgzwvzn',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
     body:JSON.stringify({
-      apiKey:'sf_e8da9955b64945025e6aa344',
-      subject:'Nouveau lead solaire — Romandie Énergies',
       name:p+' '+n,
       phone:ph,
-      message:'Propriétaire: '+(data.proprio||'N/A')+'\nType de bien: '+(data.type||'N/A')+'\nTiming: '+(data.timing||'N/A')+'\nTéléphone: '+ph,
-      replyTo:'contact@fluxclients.ch'
+      proprio:data.proprio||'N/A',
+      type:data.type||'N/A',
+      timing:data.timing||'N/A'
     })
-  }).catch(function(){});
+  }).catch(function(e){console.log('Formspree error:',e);});
 
-  // 3. Attendre 800ms que le pixel soit envoyé PUIS rediriger avec les données
+  // Redirection vers merci.html
   setTimeout(function(){
     window.location.href='/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
   }, 800);
