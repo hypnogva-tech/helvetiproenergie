@@ -359,18 +359,22 @@ function submit(){
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      apiKey:'sf_e8da9955b64945025e6aa344',
+      apiKey:'sf_45797d8f1518afe918486d6a',
       subject:'Nouveau lead solaire — Helvetipro Energie',
       name:p+' '+n,
       phone:ph,
       message:'Propriétaire: '+(data.proprio||'N/A')+'\nType de bien: '+(data.type||'N/A')+'\nTiming: '+(data.timing||'N/A')+'\nTéléphone: '+ph,
       replyTo:'contact@fluxclients.ch'
     })
-  }).catch(function(){});
-
-  setTimeout(function(){
+  }).then(function(res){
+    return res.json();
+  }).then(function(json){
+    console.log('StaticForms response:', json);
     window.location.href='/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
-  }, 800);
+  }).catch(function(err){
+    console.error('StaticForms error:', err);
+    window.location.href='/merci.html?phone='+encodeURIComponent(ph)+'&name='+encodeURIComponent(p+' '+n);
+  });
 }
 </script>
 </body>
